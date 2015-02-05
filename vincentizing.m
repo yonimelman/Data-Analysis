@@ -1,6 +1,7 @@
 %% Vincentizing Script 
 % * created by Yoni Melman, Cognitive Neuropsychology Lab, BGU
-% * last update 12.12.2014
+% * yonatanm@post.bgu.ac.il
+% * last update 05.02.2014
 
 % Information
 % ------------
