@@ -62,14 +62,11 @@ n_bins = input('How many Bins? >> '); % change this to set the number of bins
 
 
 % preparing the report file 
-report_cell = cell(1,3+n_bins);
+report_cell = cell(1,4);
 report_cell{1,1} = 'Subject_Num';
 report_cell{1,2} = 'Condition';
-report_cell{1,3} = 'mean_RT';
-for j = 1:n_bins
-    report_cell{1,3+j} = strcat('bin_',num2str(j));
-end
-
+report_cell{1,3} = 'Bins';
+report_cell{1,4} = 'bin_mean_RT';
     
 
 
@@ -85,9 +82,7 @@ for subject = subjects'
     for condition = conditions'
         rt_temp = data((data(:,1)==subject & data(:,2)==condition),3);
         sub_con_RT{subject,condition} = rt_temp;
-        report_cell{end+1,1} = subject;
-        report_cell{end,2} = condition;
-        report_cell{end,3} = mean(rt_temp);
+
     end
 end
 
@@ -100,18 +95,24 @@ bins = (100/n_bins):(100/n_bins):100;
 sub_con_bins = zeros(length(subjects),length(conditions),n_bins);
 
 
-counter = 1;
+counter = 2;
 for subject = 1:length(subjects)
     for condition = conditions'
         rt = sub_con_RT{subjects(subject),condition};
-        perc = [0, round(prctile(rt,bins))];
+        perc = [0,(prctile(rt,bins))];
         for i = 1:n_bins
             temp = rt(rt>perc(i) & rt<=perc(i+1));
             vinc(i) = mean(temp);
+            
+            % reporting cell
+            report_cell{counter,1} = subject;
+            report_cell{counter,2} = condition;
+            report_cell{counter,3} = i;
+            counter = counter + 1;
         end
         sub_con_bins(subject,condition,:) = round(vinc);
-        report_cell(1+counter,4:end) = mat2cell(round(vinc),1,ones(size(vinc)));
-        counter = counter + 1;
+        report_cell([counter-n_bins:counter-1],4) = mat2cell((vinc)',ones(size(vinc)),1);
+
     end
 end
 
