@@ -44,10 +44,38 @@ if strcmp(input('handed response?: ','s'),'yes')
 end
 
 columns.congruity.name = input('Congruity Col: ','s');
-columns.congruity.col_num = find(ismember(header,columns.congruity.name))
+columns.congruity.col_num = find(ismember(header,columns.congruity.name));
 columns.congruity.conditions = unique(data(:,columns.congruity.col_num));
 
 
-%%
+%% Creating the report cell
 
+report_cell = {};
+report_cell(1,:) = header;
+report_cell{1,end+1} = 'removed';
+report_cell{1,end+1} = 'cong_n-1';
+for i = 1:length(vars)
+    report_cell{1,end+1} = [columns.vars(i).name,'_n-1']
+    report_cell{1,end+1} = [columns.vars(i).name,'_n-1_repeat']
+end
+
+    
+%% 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+xlswrite(strcat(path_name,file_name),report_cell,2); % writes the report to the excel data file.
 
