@@ -1,3 +1,5 @@
+clear all; close all; clc
+
 [file_name, path_name] = uigetfile('*.xlsx', 'Pick an excel file'); % loads the path to the file
 data = xlsread(strcat(path_name,file_name)); % loads the excel to data matrix
 [temp,header] = xlsread(strcat(path_name,file_name),'1:1');
@@ -55,25 +57,67 @@ report_cell(1,:) = header;
 report_cell{1,end+1} = 'removed';
 report_cell{1,end+1} = 'cong_n-1';
 for i = 1:length(vars)
-    report_cell{1,end+1} = [columns.vars(i).name,'_n-1']
-    report_cell{1,end+1} = [columns.vars(i).name,'_n-1_repeat']
+    report_cell{1,end+1} = [columns.vars(i).name,'_n-1'];
+    report_cell{1,end+1} = [columns.vars(i).name,'_n-1_repeat'];
 end
 
+
+%% Sequential Analysis
+
+for s = 1:length(columns.subject.conditions)
+    disp(['processing subject: ',num2str(columns.subject.conditions(s))])
+    subject = columns.subject.conditions(s);
     
-%% 
+    %find first instance of subject
+    index = find(data(:,columns.subject.col_num)==subject,1);
     
-
-
-
-
-
-
-
-
-
-
-
-
+    report_cell(end+1,[1:length(header)]) = num2cell(data(index,:));
+    for j = length(header)+1:size(report_cell,2)
+        report_cell{end,j} = 1;
+    end
+    
+    
+    index = index + 1;
+    
+    
+    while data(index,columns.subject.col_num)==subject
+        % copy existing data to report cell
+        report_cell(end+1,[1:length(header)]) = num2cell(data(index,:));
+        
+        % ACC - remove n-1 or n == 0
+        if (data(index-1,columns.acc.col_num) == 0) || (data(index,columns.acc.col_num) == 0)
+            report_cell{end,length(header)+1} = 1;
+        else
+            report_cell{end,length(header)+1} = 0;
+        end
+        
+        % define cong condition of n-1
+        report_cell{end,length(header)+2} = data(index-1,columns.congruity.col_num);
+        
+        % find n-1 and repeats
+        for v = 1:length(vars)
+            v_n_1 = data(index-1,columns.vars(v).col_num);
+            v_n = data(index,columns.vars(v).col_num);
+            
+            report_cell{end,length(header)+2+(v-1)*2+1} = v_n_1;
+            
+            if v_n_1 == v_n
+                report_cell{end,length(header)+2+(v-1)*2+2} = 1;
+            else
+                report_cell{end,length(header)+2+(v-1)*2+2} = 0;
+            end
+        end
+            
+            
+        index = index+1;
+        if index > size(data,1)
+            break;
+        end
+        
+    end
+    
+    
+end
 
 
 
